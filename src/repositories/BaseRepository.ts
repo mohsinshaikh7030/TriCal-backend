@@ -50,13 +50,24 @@ export class BaseRepository<T> {
     if (error) throw error;
   }
 
-  async softDelete(id: string): Promise<T | null> {
+  async softDelete(id: string, userId?: string): Promise<T | null> {
+    const updates: Partial<T> = {
+        deleted_at: new Date().toISOString(),
+        updated_by: userId,
+    } as Partial<T>;
+
     const { data, error } = await supabase
       .from(this.tableName)
-      .update({ deleted_at: new Date() } as any)
+      .update(updates)
       .eq('id', id)
+      .select()
       .single();
-    if (error) throw error;
+
+    if (error) {
+      console.error(`Error soft-deleting from ${this.tableName}:`, error);
+      return null;
+    }
     return data as T;
   }
 }
+

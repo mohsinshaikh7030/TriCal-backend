@@ -4,11 +4,13 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import blogRoutes from './routes/BlogRoutes';
+import authRoutes from './routes/AuthRoutes';
+import adminRoutes from './routes/AdminRoutes';
+import mediaRoutes from './routes/MediaRoutes';
 import errorHandler from './middlewares/errorHandler';
 
 // For env File 
 dotenv.config();
-
 const app: Application = express();
 const port = process.env.PORT || 8000;
 
@@ -20,7 +22,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // API Routes
+app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/blogs', blogRoutes);
+app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/media', mediaRoutes);
+
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Welcome to Express & TypeScript Server');

@@ -18,6 +18,10 @@ class BlogService {
     return await blogRepository.findBySlug(slug);
   }
 
+  async getAllBlogs(): Promise<Blog[]> {
+    return await blogRepository.findAll();
+  }
+
   async updateBlog(id: string, updates: Partial<Blog>): Promise<Blog | null> {
     // Business logic before updating
     if (updates.title && !updates.slug) {
@@ -26,9 +30,9 @@ class BlogService {
     return await blogRepository.update(id, updates);
   }
 
-  async deleteBlog(id: string): Promise<void> {
-    // We'll use soft delete
-    await blogRepository.softDelete(id);
+  async deleteBlog(id: string, userId?: string): Promise<void> {
+    // We'll use soft delete. The userId can be used for permission checks or logging.
+    await blogRepository.softDelete(id, userId);
   }
 
   private generateSlug(title: string): string {

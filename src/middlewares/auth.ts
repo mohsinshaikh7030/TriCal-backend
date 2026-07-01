@@ -1,9 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import supabase from '@/config/supabaseClient';
-
-export interface AuthenticatedRequest extends Request {
-  user?: any; // You can define a more specific user type
-}
+import { authRepository } from '@/repositories/AuthRepository';
+import { AuthenticatedRequest } from '@/types/express'; // Assuming the type is defined here
 
 export const authMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -15,13 +13,26 @@ export const authMiddleware = async (req: AuthenticatedRequest, res: Response, n
   try {
     const { data: { user }, error } = await supabase.auth.getUser(token);
 
-    if (error) {
-      return res.status(401).json({ message: 'Invalid token.', error: error.message });
+    if (error || !user) {
+      return res.status(401).json({ message: 'Invalid or expired token.', error: error?.message });
     }
 
-    req.user = user;
+    // Fetch user profile with role and permissions
+    const userProfile = await authRepository.findUserWithRoleAndPermissions(user.id);
+    
+    if (!userProfile) {
+        // This case can happen if a user is deleted from auth.users but the token is not yet expired
+        return res.status(401).json({ message: 'User not found.' });
+    }
+
+    req.user = {
+      ...user,
+      ...userProfile
+    };
+    
     next();
   } catch (error) {
     next(error);
   }
 };
+

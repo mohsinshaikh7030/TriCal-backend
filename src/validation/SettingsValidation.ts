@@ -1,0 +1,86 @@
+import { z } from 'zod';
+
+export const settingsSchema = z.object({
+  general: z.object({
+    websiteName: z.string().min(1, 'Website name is required'),
+    websiteTagline: z.string().optional(),
+    websiteDescription: z.string().optional(),
+    websiteLogo: z.string().optional(),
+    websiteFavicon: z.string().optional(),
+    defaultLanguage: z.enum(['en', 'hi', 'mr', 'ur']).default('en'),
+    timezone: z.string().min(1, 'Timezone is required'),
+    dateFormat: z.string().min(1, 'Date format is required'),
+    timeFormat: z.string().min(1, 'Time format is required'),
+    homepageTitle: z.string().min(1, 'Homepage title is required'),
+  }),
+  contact: z.object({
+    companyName: z.string().optional(),
+    address: z.string().optional(),
+    phoneNumber: z.string().optional(),
+    whatsappNumber: z.string().optional(),
+    supportEmail: z.string().email().optional().or(z.literal('')),
+    contactEmail: z.string().email().optional().or(z.literal('')),
+    googleMapsEmbed: z.string().optional(),
+    workingHours: z.string().optional(),
+  }),
+  social: z.object({
+    facebook: z.string().url().optional().or(z.literal('')),
+    instagram: z.string().url().optional().or(z.literal('')),
+    twitter: z.string().url().optional().or(z.literal('')),
+    linkedIn: z.string().url().optional().or(z.literal('')),
+    youtube: z.string().url().optional().or(z.literal('')),
+    telegram: z.string().url().optional().or(z.literal('')),
+    whatsapp: z.string().url().optional().or(z.literal('')),
+  }),
+  seo: z.object({
+    defaultMetaTitle: z.string().optional(),
+    defaultMetaDescription: z.string().optional(),
+    defaultKeywords: z.string().optional(),
+    openGraphImage: z.string().optional(),
+    twitterCardImage: z.string().optional(),
+    canonicalUrl: z.string().url().optional().or(z.literal('')),
+    robotsTxt: z.string().optional(),
+    googleVerificationCode: z.string().optional(),
+    bingVerificationCode: z.string().optional(),
+    yandexVerificationCode: z.string().optional(),
+  }),
+  analytics: z.object({
+    googleAnalyticsId: z.string().optional(),
+    googleTagManagerId: z.string().optional(),
+    microsoftClarityId: z.string().optional(),
+    facebookPixelId: z.string().optional(),
+  }),
+  advertisement: z.object({
+    googleAdSensePublisherId: z.string().optional(),
+    adUnitIds: z.string().optional(),
+    enableAds: z.boolean().default(false),
+  }),
+  email: z.object({
+    smtpHost: z.string().optional(),
+    smtpPort: z.coerce.number().optional(),
+    smtpUsername: z.string().optional(),
+    smtpPassword: z.string().optional(),
+    senderName: z.string().optional(),
+    senderEmail: z.string().email().optional().or(z.literal('')),
+  }),
+  appearance: z.object({
+    theme: z.enum(['light', 'dark']).default('light'),
+    accentColor: z.string().optional(),
+    primaryColor: z.string().optional(),
+    secondaryColor: z.string().optional(),
+    enableThemeSwitching: z.boolean().default(false),
+  }),
+  localization: z.object({
+    defaultLanguage: z.enum(['en', 'hi', 'mr', 'ur']).default('en'),
+    supportedLanguages: z.array(z.enum(['en', 'hi', 'mr', 'ur'])).default(['en']),
+  }),
+  security: z.object({
+    sessionTimeout: z.coerce.number().default(30),
+    passwordPolicy: z.string().optional(),
+    enableRegistration: z.boolean().default(true),
+    requireEmailVerification: z.boolean().default(true),
+    enableCaptcha: z.boolean().default(false),
+  }),
+});
+
+export type SettingsPayload = z.infer<typeof settingsSchema>;
