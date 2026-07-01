@@ -26,9 +26,8 @@ class BlogRepository extends BaseRepository<Blog> {
   // Add any blog-specific database methods here if needed
   // For example:
   async findBySlug(slug: string): Promise<Blog | null> {
-    const { data, error } = await this.find({ slug } as Partial<Blog>);
-    if (error) throw error;
-    return data.length > 0 ? data[0] : null;
+    const results = await this.find({ slug } as Partial<Blog>);
+    return results.length > 0 ? results[0] : null;
   }
 }
 

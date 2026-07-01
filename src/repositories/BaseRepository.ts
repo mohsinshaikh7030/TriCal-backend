@@ -1,5 +1,4 @@
 import supabase from '@/config/supabaseClient';
-import { PostgrestResponse, PostgrestError } from '@supabase/supabase-js';
 
 export class BaseRepository<T> {
   protected tableName: string;
@@ -11,7 +10,7 @@ export class BaseRepository<T> {
   async create(data: Partial<T>): Promise<T | null> {
     const { data: result, error } = await supabase
       .from(this.tableName)
-      .insert(data)
+      .insert(data as any)
       .single();
     if (error) throw error;
     return result as T;
@@ -39,7 +38,7 @@ export class BaseRepository<T> {
   async update(id: string, updates: Partial<T>): Promise<T | null> {
     const { data, error } = await supabase
       .from(this.tableName)
-      .update(updates)
+      .update(updates as any)
       .eq('id', id)
       .single();
     if (error) throw error;

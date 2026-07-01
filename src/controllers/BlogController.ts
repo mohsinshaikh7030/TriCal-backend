@@ -14,6 +14,9 @@ class BlogController {
   async getBlog(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
+      if (typeof id !== 'string') {
+        return res.status(400).json({ message: 'Invalid blog ID.' });
+      }
       const blog = await blogService.getBlogById(id);
       if (!blog) {
         return res.status(404).json({ message: 'Blog not found' });
@@ -27,6 +30,9 @@ class BlogController {
   async getBlogBySlug(req: Request, res: Response, next: NextFunction) {
     try {
       const { slug } = req.params;
+      if (typeof slug !== 'string') {
+        return res.status(400).json({ message: 'Invalid blog slug.' });
+      }
       const blog = await blogService.getBlogBySlug(slug);
       if (!blog) {
         return res.status(404).json({ message: 'Blog not found' });
@@ -40,6 +46,9 @@ class BlogController {
   async updateBlog(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
+      if (typeof id !== 'string') {
+        return res.status(400).json({ message: 'Invalid blog ID.' });
+      }
       const blog = await blogService.updateBlog(id, req.body);
       if (!blog) {
         return res.status(404).json({ message: 'Blog not found' });
@@ -53,6 +62,9 @@ class BlogController {
   async deleteBlog(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
+      if (typeof id !== 'string') {
+        return res.status(400).json({ message: 'Invalid blog ID.' });
+      }
       await blogService.deleteBlog(id);
       res.status(204).send();
     } catch (error) {
