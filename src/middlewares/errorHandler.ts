@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { PostgrestError } from '@supabase/supabase-js';
 
 const errorHandler = (err: Error | PostgrestError, req: Request, res: Response, _next: NextFunction) => {

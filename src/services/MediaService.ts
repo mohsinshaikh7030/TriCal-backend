@@ -1,6 +1,7 @@
 import SupabaseStorageService from './supabaseStorage';
 import { ApiError } from '../utils/ApiError';
 import supabase from '../config/supabaseClient';
+import { mediaRepository } from '../repositories/MediaRepository';
 
 interface MediaQueryOptions {
   search?: string;
@@ -28,7 +29,7 @@ class MediaService {
           size: file.size,
           createdAt: new Date().toISOString(),
           uploadedBy: userId,
-          publicUrl: SupabaseStorageService.getPublicUrl(bucket, filePath).data.publicUrl,
+          publicUrl: SupabaseStorageService.getPublicUrl(bucket, filePath).publicUrl,
         };
       })
     );
@@ -54,7 +55,7 @@ class MediaService {
     const files = await SupabaseStorageService.listFiles(bucket);
     const assets = (files ?? []).map((file) => {
       const filePath = file.name;
-      const publicUrl = SupabaseStorageService.getPublicUrl(bucket, filePath).data.publicUrl;
+      const publicUrl = SupabaseStorageService.getPublicUrl(bucket, filePath).publicUrl;
       const mimeType = file.metadata?.mimetype ?? 'application/octet-stream';
       return {
         path: filePath,
@@ -108,6 +109,48 @@ class MediaService {
     await this.deleteFile(bucket, oldFilePath);
 
     return data;
+  }
+
+  async createSignedUploadUrl(bucket: string, fileName: string, contentType: string, userId: string) {
+    const safeName = fileName.replace(/\s+/g, '-');
+    const filePath = `${userId}/${Date.now()}_${safeName}`;
+    const data = await SupabaseStorageService.createSignedUploadUrl(bucket, filePath);
+    return {
+      path: data.signedUrl,
+      token: data.token,
+      storagePath: filePath,
+    };
+  }
+
+  async createMediaRecord(payload: {
+    file_name: string;
+    file_path: string;
+    file_type: string;
+    file_size: number;
+    bucket_id: string;
+    userId: string;
+  }) {
+    let cleanPath = payload.file_path;
+    if (cleanPath.startsWith('http')) {
+      const marker = `/upload/sign/${payload.bucket_id}/`;
+      const idx = cleanPath.indexOf(marker);
+      if (idx !== -1) {
+        cleanPath = cleanPath.substring(idx + marker.length).split('?')[0];
+      }
+    }
+
+    const mediaRecord = {
+      file_name: payload.file_name,
+      file_path: cleanPath,
+      file_type: payload.file_type,
+      file_size: payload.file_size,
+      bucket_id: payload.bucket_id,
+      created_by: payload.userId,
+      updated_by: payload.userId,
+      status: 'active'
+    };
+
+    return await mediaRepository.create(mediaRecord as any);
   }
 
   private getAssetType(mimeType: string) {

@@ -1,6 +1,6 @@
-import { ApiError } from '@/utils/ApiError';
-import { settingsRepository } from '@/repositories/SettingsRepository';
-import { settingsSchema, type SettingsPayload } from '@/validation/SettingsValidation';
+import { ApiError } from '../utils/ApiError'
+import { settingsRepository } from '../repositories/SettingsRepository'
+import { settingsSchema, type SettingsPayload } from '../validation/SettingsValidation'
 
 class SettingsService {
   async getSettings() {

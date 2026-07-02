@@ -1,7 +1,7 @@
 
-import { Request, Response, NextFunction } from 'express';
-import { authService } from '@/services/AuthService';
-import { AuthenticatedRequest } from '@/types/express';
+import type { Request, Response, NextFunction } from 'express';
+import { authService } from '../services/AuthService'
+import type { AuthenticatedRequest } from '../types/express/index'
 
 class AuthController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -69,11 +69,11 @@ class AuthController {
 
   async verifyEmail(req: Request, res: Response, next: NextFunction) {
     try {
-      const { token } = req.body;
-      if (!token) {
-        return res.status(400).json({ message: 'Verification token is required.' });
+      const { token, email } = req.body;
+      if (!token || !email) {
+        return res.status(400).json({ message: 'Verification token and email are required.' });
       }
-      await authService.verifyEmail(token);
+      await authService.verifyEmail(token, email);
       res.status(200).json({ message: 'Email verified successfully.' });
     } catch (error) {
       next(error);

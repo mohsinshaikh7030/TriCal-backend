@@ -1,7 +1,7 @@
-import { Response, NextFunction } from 'express';
-import { blogService } from '@/services/BlogService';
-import { AuthenticatedRequest } from '@/types/express';
-import { Request } from 'express';
+import type { Response, NextFunction } from 'express';
+import { blogService } from '../services/BlogService'
+import type { AuthenticatedRequest } from '../types/express/index'
+import type { Request } from 'express';
 
 class BlogController {
   async createBlog(req: AuthenticatedRequest, res: Response, next: NextFunction) {

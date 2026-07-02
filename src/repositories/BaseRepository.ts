@@ -1,4 +1,4 @@
-import supabase from '@/config/supabaseClient';
+import supabase from '../config/supabaseClient'
 
 export class BaseRepository<T> {
   protected tableName: string;
@@ -35,6 +35,14 @@ export class BaseRepository<T> {
     return data as T[];
   }
 
+  async findAll(): Promise<T[]> {
+    const { data, error } = await supabase
+      .from(this.tableName)
+      .select('*');
+    if (error) throw error;
+    return data as T[];
+  }
+
   async update(id: string, updates: Partial<T>): Promise<T | null> {
     const { data, error } = await supabase
       .from(this.tableName)
@@ -51,14 +59,14 @@ export class BaseRepository<T> {
   }
 
   async softDelete(id: string, userId?: string): Promise<T | null> {
-    const updates: Partial<T> = {
-        deleted_at: new Date().toISOString(),
-        updated_by: userId,
-    } as Partial<T>;
+    const updates = {
+      deleted_at: new Date().toISOString(),
+      updated_by: userId,
+    };
 
     const { data, error } = await supabase
       .from(this.tableName)
-      .update(updates)
+      .update(updates as any)
       .eq('id', id)
       .select()
       .single();

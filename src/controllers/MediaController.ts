@@ -1,15 +1,15 @@
-import { NextFunction, Request, Response } from 'express';
-import MediaService from '@/services/MediaService';
-import { AuthenticatedRequest } from '@/types/express';
-import { ApiError } from '@/utils/ApiError';
+import type { NextFunction, Request, Response } from 'express';
+import MediaService from '../services/MediaService'
+import type { AuthenticatedRequest } from '../types/express/index'
+import { ApiError } from '../utils/ApiError'
 
 class MediaController {
   async listMedia(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const bucket = typeof req.query.bucket === 'string' ? req.query.bucket : 'documents';
       const search = typeof req.query.search === 'string' ? req.query.search : '';
-      const type = typeof req.query.type === 'string' ? req.query.type : 'all';
-      const sortBy = typeof req.query.sortBy === 'string' ? req.query.sortBy : 'newest';
+      const type = (typeof req.query.type === 'string' ? req.query.type : 'all') as 'all' | 'image' | 'document';
+      const sortBy = (typeof req.query.sortBy === 'string' ? req.query.sortBy : 'newest') as 'newest' | 'oldest' | 'largest' | 'smallest';
 
       const assets = await MediaService.listMediaAssets(bucket, { search, type, sortBy });
       res.status(200).json(assets);
@@ -78,6 +78,41 @@ class MediaController {
       const filePaths = Array.isArray(req.body.filePaths) ? req.body.filePaths : [];
       await MediaService.bulkDeleteFiles(bucket, filePaths);
       res.status(200).json({ success: true });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getSignedUrl(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const { fileName, contentType } = req.body;
+      if (!fileName || !contentType) {
+        throw new ApiError(400, 'fileName and contentType are required');
+      }
+      const bucket = 'media';
+      const userId = req.user?.id ?? 'unknown-user';
+
+      const result = await MediaService.createSignedUploadUrl(bucket, fileName, contentType, userId);
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async createMediaRecord(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const { file_name, file_path, file_type, file_size, bucket_id } = req.body;
+      const userId = req.user?.id ?? 'unknown-user';
+
+      const record = await MediaService.createMediaRecord({
+        file_name,
+        file_path,
+        file_type,
+        file_size,
+        bucket_id,
+        userId
+      });
+      res.status(201).json(record);
     } catch (error) {
       next(error);
     }

@@ -1,6 +1,6 @@
 
-import { Request, Response, NextFunction } from 'express';
-import { dashboardService } from '@/services/DashboardService';
+import type { Request, Response, NextFunction } from 'express';
+import { dashboardService } from '../services/DashboardService'
 
 class DashboardController {
     async getStats(req: Request, res: Response, next: NextFunction) {

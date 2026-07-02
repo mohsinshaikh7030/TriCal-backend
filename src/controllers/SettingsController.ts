@@ -1,6 +1,6 @@
 
-import { Request, Response, NextFunction } from 'express';
-import { settingsService } from '@/services/SettingsService';
+import type { Request, Response, NextFunction } from 'express';
+import { settingsService } from '../services/SettingsService'
 
 class SettingsController {
   async getSettings(req: Request, res: Response, next: NextFunction) {

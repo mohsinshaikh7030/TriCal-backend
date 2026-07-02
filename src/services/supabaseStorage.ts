@@ -29,10 +29,22 @@ class SupabaseStorageService {
     return data;
   }
 
-  async getPublicUrl(bucket: string, filePath: string) {
+  getPublicUrl(bucket: string, filePath: string) {
     const { data } = supabase.storage
       .from(bucket)
       .getPublicUrl(filePath);
+
+    return data;
+  }
+
+  async createSignedUploadUrl(bucket: string, filePath: string) {
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .createSignedUploadUrl(filePath);
+
+    if (error) {
+      throw new ApiError(500, `Failed to create signed upload URL: ${error.message}`);
+    }
 
     return data;
   }

@@ -1,11 +1,12 @@
 
 import { Router } from 'express';
-import { userManagementController } from '@/controllers/UserManagementController';
-import { dashboardController } from '@/controllers/DashboardController';
-import { settingsController } from '@/controllers/SettingsController';
-import { mediaController } from '@/controllers/MediaController';
-import { authMiddleware } from '@/middlewares/auth';
-import { hasRole } from '@/middlewares/role';
+import { userManagementController } from '../controllers/UserManagementController'
+import { dashboardController } from '../controllers/DashboardController'
+import { settingsController } from '../controllers/SettingsController'
+import { mediaController } from '../controllers/MediaController'
+import { calendarController } from '../controllers/CalendarController'
+import { authMiddleware } from '../middlewares/auth'
+import { hasRole } from '../middlewares/role'
 
 const router = Router();
 
@@ -31,6 +32,20 @@ settingsRouter.use(hasRole('Admin')); // Assuming Admins can change settings
 settingsRouter.get('/settings', settingsController.getSettings);
 settingsRouter.put('/settings', settingsController.updateSettings);
 router.use(settingsRouter);
+
+// Calendar & Festival Management Routes (Admin and Super Admin)
+const calendarAdminRouter = Router();
+calendarAdminRouter.use(hasRole('Admin'));
+calendarAdminRouter.get('/holidays', calendarController.getAllHolidays);
+calendarAdminRouter.post('/holidays', calendarController.createHoliday);
+calendarAdminRouter.put('/holidays/:id', calendarController.updateHoliday);
+calendarAdminRouter.delete('/holidays/:id', calendarController.deleteHoliday);
+calendarAdminRouter.get('/festivals', calendarController.getAllFestivals);
+calendarAdminRouter.post('/festivals', calendarController.createFestival);
+calendarAdminRouter.put('/festivals/:id', calendarController.updateFestival);
+calendarAdminRouter.delete('/festivals/:id', calendarController.deleteFestival);
+calendarAdminRouter.get('/holiday-categories', calendarController.getHolidayCategories);
+router.use(calendarAdminRouter);
 
 // User Management Routes (Super Admin only)
 const userManagementRouter = Router();

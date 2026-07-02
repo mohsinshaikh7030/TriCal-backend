@@ -1,7 +1,7 @@
-import { Response, NextFunction } from 'express';
-import supabase from '@/config/supabaseClient';
-import { authRepository } from '@/repositories/AuthRepository';
-import { AuthenticatedRequest } from '@/types/express'; // Assuming the type is defined here
+import type { Response, NextFunction } from 'express';
+import supabase from '../config/supabaseClient'
+import { authRepository } from '../repositories/AuthRepository'
+import type { AuthenticatedRequest } from '../types/express/index' // Assuming the type is defined here
 
 export const authMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   const token = req.headers.authorization?.split(' ')[1];

@@ -1,6 +1,6 @@
 
-import { Request, Response, NextFunction } from 'express';
-import { userManagementService } from '@/services/UserManagementService';
+import type { Request, Response, NextFunction } from 'express';
+import { userManagementService } from '../services/UserManagementService'
 
 class UserManagementController {
     async getAllUsers(req: Request, res: Response, next: NextFunction) {
@@ -45,7 +45,7 @@ class UserManagementController {
     async deleteUser(req: Request, res: Response, next: NextFunction) {
         try {
             const { userId } = req.params;
-            await userManagementService.deleteUser(userId);
+            await userManagementService.deleteUser(userId as string);
             res.status(204).send();
         } catch (error) {
             next(error);

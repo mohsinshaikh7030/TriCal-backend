@@ -1,9 +1,14 @@
+import { Request } from 'express';
+import { UserWithRoleAndPermissions } from '../../repositories/AuthRepository';
 
-import { UserWithRoleAndPermissions } from "@/repositories/AuthRepository";
-
-declare namespace Express {
-  export interface Request {
-    user?: UserWithRoleAndPermissions;
+declare global {
+  namespace Express {
+    interface Request {
+      user?: UserWithRoleAndPermissions;
+    }
   }
 }
 
+export interface AuthenticatedRequest extends Request {
+  user?: UserWithRoleAndPermissions;
+}

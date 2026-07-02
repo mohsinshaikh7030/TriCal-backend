@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { mediaController } from '@/controllers/MediaController';
-import { authMiddleware } from '@/middlewares/auth';
-import { hasPermission } from '@/middlewares/role';
-import { upload } from '@/middlewares/upload';
+import { mediaController } from '../controllers/MediaController'
+import { authMiddleware } from '../middlewares/auth'
+import { hasPermission } from '../middlewares/role'
+import { upload } from '../middlewares/upload'
 
 const router = Router();
 

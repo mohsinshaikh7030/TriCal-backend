@@ -1,23 +1,19 @@
 
-import supabase from '@/config/supabaseClient';
+import supabase from '../config/supabaseClient'
 
 class DashboardService {
     async getStats() {
-        // In a real app, these would be more robust queries
         const { count: userCount, error: userError } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
         const { count: blogCount, error: blogError } = await supabase.from('blogs').select('*', { count: 'exact', head: true });
-
-        // Mocking counts for non-existent resources
-        const festivalCount = 0;
-        const holidayCount = 0;
-        const calendarEventCount = 0;
+        const { count: festivalCount, error: festivalError } = await supabase.from('festivals').select('*', { count: 'exact', head: true });
+        const { count: holidayCount, error: holidayError } = await supabase.from('holidays').select('*', { count: 'exact', head: true });
 
         return {
             userCount: userError ? 0 : userCount,
             blogCount: blogError ? 0 : blogCount,
-            festivalCount,
-            holidayCount,
-            calendarEventCount,
+            festivalCount: festivalError ? 0 : festivalCount,
+            holidayCount: holidayError ? 0 : holidayCount,
+            calendarEventCount: 0,
         };
     }
 }

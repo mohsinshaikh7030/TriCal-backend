@@ -1,12 +1,15 @@
-import express, { Request, Response, Application } from 'express';
+import express from 'express';
+import type { Request, Response, Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import { runAutoSeeder } from './config/autoSeed';
 import blogRoutes from './routes/BlogRoutes';
 import authRoutes from './routes/AuthRoutes';
 import adminRoutes from './routes/AdminRoutes';
 import mediaRoutes from './routes/MediaRoutes';
+import calendarRoutes from './routes/CalendarRoutes';
 import errorHandler from './middlewares/errorHandler';
 
 // For env File 
@@ -26,6 +29,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/blogs', blogRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/media', mediaRoutes);
+app.use('/api/v1/calendar', calendarRoutes);
 
 
 app.get('/', (req: Request, res: Response) => {
@@ -35,6 +39,7 @@ app.get('/', (req: Request, res: Response) => {
 // Global Error Handler
 app.use(errorHandler);
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`Server is Fire at http://localhost:${port}`);
+  await runAutoSeeder();
 });

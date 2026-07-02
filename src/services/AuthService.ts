@@ -1,7 +1,8 @@
 
-import supabase from '@/config/supabaseClient';
-import { authRepository, UserWithRoleAndPermissions } from '@/repositories/AuthRepository';
-import { ApiError } from '@/utils/ApiError';
+import supabase from '../config/supabaseClient'
+import { authRepository } from '../repositories/AuthRepository'
+import type { UserWithRoleAndPermissions } from '../repositories/AuthRepository'
+import { ApiError } from '../utils/ApiError'
 
 class AuthService {
   async register({ email, password, full_name }: Record<string, any>) {
@@ -27,10 +28,10 @@ class AuthService {
     // The profiles table has a role_id which is nullable, so a user can exist without a role.
     // Let's assign the default 'User' role.
 
-    const { data: roleData, error: roleError } = await supabase.from('roles').select('id').eq('name', 'Viewer').single();
+    const { data: roleData, error: roleError } = await supabase.from('roles').select('id').eq('name', 'User').single();
     if (roleError || !roleData) {
         // This is a critical error, maybe the seed didn't run.
-        console.error("Default role 'Viewer' not found. Assigning role will be skipped.");
+        console.error("Default role 'User' not found. Assigning role will be skipped.");
     } else {
         const { error: profileError } = await supabase.from('profiles').update({ role_id: roleData.id, full_name: full_name }).eq('id', signUpData.user.id);
         if(profileError) {

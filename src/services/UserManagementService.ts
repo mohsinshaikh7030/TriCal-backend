@@ -1,24 +1,45 @@
 
-import supabase from '@/config/supabaseClient';
-import { ApiError } from '@/utils/ApiError';
+import supabase from '../config/supabaseClient'
+import { ApiError } from '../utils/ApiError'
 
 class UserManagementService {
     async getAllUsers() {
-        const { data, error } = await supabase
+        // 1. Fetch profiles
+        const { data: profiles, error: profileError } = await supabase
             .from('profiles')
             .select(`
                 id,
                 full_name,
-                email:users(email),
                 role:roles(name),
                 status,
                 created_at
             `);
 
-        if (error) {
-            throw new ApiError(500, "Failed to fetch users.");
+        if (profileError) {
+            throw new ApiError(500, "Failed to fetch user profiles: " + profileError.message);
         }
-        return data;
+
+        // 2. Fetch auth users
+        const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
+        
+        if (authError) {
+            console.error('Failed to list auth users:', authError.message);
+        }
+
+        const authUsers = authData?.users || [];
+
+        // 3. Merge profiles and auth users
+        return (profiles || []).map((profile: any) => {
+            const authUser = authUsers.find((u: any) => u.id === profile.id);
+            return {
+                id: profile.id,
+                full_name: profile.full_name,
+                email: { email: authUser?.email || 'N/A' },
+                role: { name: Array.isArray(profile.role) ? (profile.role[0]?.name || 'Viewer') : (profile.role as any)?.name || 'Viewer' },
+                status: profile.status,
+                created_at: profile.created_at
+            };
+        });
     }
 
     async createUser(userData: any) {

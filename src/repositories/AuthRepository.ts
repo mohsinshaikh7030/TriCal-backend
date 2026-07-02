@@ -1,5 +1,5 @@
 
-import supabase from '@/config/supabaseClient';
+import supabase from '../config/supabaseClient'
 import { BaseRepository } from './BaseRepository';
 
 // Define a more detailed Profile type based on your schema
@@ -55,18 +55,22 @@ class AuthRepository extends BaseRepository<Profile> {
         // continue without email if it fails
     }
 
-    const permissions = data.permissions.flatMap((p: any) => 
-        p.role_permissions.map((rp: any) => rp.permissions.name)
-    );
+    const permissions = Array.isArray(data.permissions)
+        ? data.permissions.flatMap((p: any) => 
+            Array.isArray(p?.role_permissions)
+                ? p.role_permissions.map((rp: any) => rp?.permissions?.name).filter(Boolean)
+                : []
+          )
+        : [];
 
     return {
         id: data.id,
         username: data.username,
         full_name: data.full_name,
         avatar_url: data.avatar_url,
-        role: data.role.name,
+        role: Array.isArray(data.role) ? (data.role[0]?.name || '') : (data.role as any)?.name || '',
         permissions,
-        email: user.user?.email,
+        email: user?.user?.email,
     } as UserWithRoleAndPermissions;
   }
 }

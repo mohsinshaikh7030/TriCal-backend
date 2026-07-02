@@ -1,6 +1,6 @@
 import multer from 'multer';
 import path from 'path';
-import { ApiError } from '@/utils/ApiError';
+import { ApiError } from '../utils/ApiError'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
